@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nakashima Birthday Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:     #0d2347;
+  --navy-mid: #142d5c;
+  --navy-lt:  #1e3f7a;
+  --gold:     #c8993a;
+  --gold-lt:  #e8b84b;
+  --silver:   #a0aec0;
+  --white:    #f7f9fc;
+  --bg:       #f0f4f9;
+  --surface:  #ffffff;
+  --border:   #d5dde8;
+  --text:     #1a2a4a;
+  --text-muted: #6b7fa0;
+  --radius:   14px;
+  --shadow:   0 4px 24px rgba(13,35,71,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ===== HEADER ===== */
+header {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-lt) 100%);
+  color: white;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  box-shadow: 0 2px 16px rgba(13,35,71,0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header-logo {
+  width: 36px; height: 36px;
+  background: var(--gold);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.header-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.header-title span {
+  display: block;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.6);
+  margin-top: 1px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-btn {
+  padding: 7px 18px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: transparent;
+  color: rgba(255,255,255,0.75);
+  font-size: 0.82rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.nav-btn.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.nav-btn:hover:not(.active) {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+
+
+/* ===== PAGES ===== */
+.page { display: none; padding: 28px 32px; }
+.page.active { display: block; }
+
+@media(max-width:600px) {
+  .page { padding: 20px 16px; }
+  header { padding: 0 16px; }
+  .sync-bar { padding: 6px 16px; }
+}
+
+/* ===== TODAY SECTION ===== */
+.today-section {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-lt) 100%);
+  border-radius: var(--radius);
+  padding: 36px 40px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  color: white;
+  transition: all 0.4s;
+}
+
+.today-section::after {
+  content: '🎂';
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 7rem;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+.today-section.has-birthday {
+  background: linear-gradient(135deg, #0d2347 0%, #1a3a6e 50%, #0d2347 100%);
+  box-shadow: 0 0 0 2px var(--gold), 0 8px 40px rgba(200,153,58,0.3);
+}
+
+.today-section.has-birthday::after {
+  animation: floatCake 3s ease-in-out infinite;
+  opacity: 0.15;
+}
+
+@keyframes floatCake {
+  0%,100% { transform: translateY(-50%) scale(1); }
+  50% { transform: translateY(-58%) scale(1.08); }
+}
+
+.today-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-lt);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.today-label::before {
+  content:'';
+  width: 20px; height: 1px;
+  background: var(--gold-lt);
+}
+
+.today-date-line {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: 0.03em;
+}
+
+.today-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.today-card {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(200,153,58,0.5);
+  border-radius: 16px;
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 260px;
+  flex: 1;
+  animation: slideUp 0.4s ease both;
+  backdrop-filter: blur(4px);
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(16px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.bday-avatar {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--navy);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 3px solid rgba(255,255,255,0.4);
+  box-shadow: 0 0 20px rgba(200,153,58,0.5);
+}
+
+.bday-name { font-weight: 700; font-size: 1.4rem; margin-bottom: 4px; letter-spacing: 0.02em; }
+.bday-dept { font-size: 0.9rem; }
+.bday-age {
+  margin-left: auto;
+  text-align: right;
+  flex-shrink: 0;
+}
+.bday-age .num {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--gold-lt);
+}
+.bday-age small { font-size: 0.65rem; color: rgba(255,255,255,0.5); }
+
+.today-none {
+  color: rgba(255,255,255,0.5);
+  font-size: 1rem;
+}
+
+.bday-celebrate {
+  font-size: 0.9rem;
+  color: var(--gold-lt);
+  margin-top: 6px;
+  letter-spacing: 0.05em;
+}
+
+/* ===== WEEK GRID ===== */
+.section-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title::after {
+  content:'';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+@media(max-width:680px) {
+  .week-grid { grid-template-columns: repeat(4,1fr); }
+}
+
+.day-cell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: var(--shadow);
+}
+
+.day-cell:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(13,35,71,0.12); }
+
+.day-cell.is-today {
+  border-color: var(--gold);
+  background: #fffbf0;
+  box-shadow: 0 0 0 2px var(--gold), var(--shadow);
+}
+
+.day-cell.is-today .day-n { color: var(--gold); }
+
+.dc-wd {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.day-n {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.35rem;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.dc-chips { display: flex; flex-direction: column; gap: 3px; width: 100%; }
+
+.dc-chip {
+  background: var(--navy);
+  color: white;
+  border-radius: 100px;
+  font-size: 0.62rem;
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.day-cell.is-today .dc-chip { background: var(--gold); color: var(--navy); }
+
+/* ===== UPCOMING ===== */
+.upcoming-list { display: flex; flex-direction: column; gap: 8px; }
+
+.upc-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s;
+}
+
+.upc-item:hover { box-shadow: 0 6px 24px rgba(13,35,71,0.12); }
+
+.upc-cal {
+  width: 56px; height: 46px;
+  border-radius: 10px;
+  background: var(--navy);
+  color: white;
+  display: flex;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.upc-cal .cd { font-family: 'Shippori Mincho', serif; font-size: 1.1rem; font-weight: 600; }
+
+.upc-info { flex: 1; }
+.upc-name { font-weight: 500; margin-bottom: 2px; }
+.upc-dept { font-size: 0.75rem; color: var(--text-muted); }
+
+.upc-badge {
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border-radius: 100px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.badge-hot  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.badge-soon { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+.badge-ok   { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+
+/* ===== MASTER ===== */
+.master-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.master-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gas-url-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow);
+}
+
+.gas-url-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.gas-url-input {
+  flex: 1;
+  min-width: 200px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.gas-url-input:focus { border-color: var(--navy-lt); }
+
+.gas-url-input::placeholder { color: var(--text-muted); }
+
+.btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: white;
+}
+
+.btn-primary:hover { background: var(--navy-lt); }
+
+.btn-gold {
+  background: var(--gold);
+  color: var(--navy);
+}
+
+.btn-gold:hover { background: var(--gold-lt); }
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.btn-outline:hover { border-color: var(--navy-lt); color: var(--navy); }
+
+.btn-danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.btn-danger:hover { background: #fee2e2; }
+
+.btn-sm { padding: 5px 12px; font-size: 0.76rem; }
+
+.search-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.search-in, .dept-sel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-in { flex: 1; min-width: 160px; }
+.dept-sel { min-width: 130px; }
+.search-in:focus, .dept-sel:focus { border-color: var(--navy-lt); }
+
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+th {
+  background: var(--navy);
+  color: rgba(255,255,255,0.75);
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+td {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.86rem;
+  vertical-align: middle;
+}
+
+tr:hover td { background: #f7f9fc; }
+
+.dept-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* ===== MODAL ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13,35,71,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 28px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 60px rgba(13,35,71,0.2);
+  transform: translateY(24px);
+  transition: transform 0.25s;
+}
+
+.overlay.open .modal { transform: translateY(0); }
+
+.modal-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.2rem;
+  color: var(--navy);
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-group { margin-bottom: 14px; }
+
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+  letter-spacing: 0.05em;
+}
+
+.req { color: #dc2626; }
+
+.form-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus { border-color: var(--navy-lt); }
+
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--navy);
+  color: white;
+  border-radius: 100px;
+  padding: 10px 22px;
+  font-size: 0.84rem;
+  z-index: 400;
+  transition: transform 0.3s;
+  box-shadow: 0 4px 20px rgba(13,35,71,0.3);
+  white-space: nowrap;
+}
+
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ===== EMPTY ===== */
+.empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+}
+
+.empty .ei { font-size: 2.5rem; margin-bottom: 10px; }
+
+/* ===== CONFETTI ===== */
+.confetti-wrap {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.cp {
+  position: absolute;
+  top: -10px;
+  animation: fall linear forwards;
+  border-radius: 2px;
+}
+
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(540deg); opacity: 0; }
+}
+
+
+
+pre {
+  background: var(--navy);
+  color: #a8d8a8;
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 0.78rem;
+  overflow-x: auto;
+  margin-top: 10px;
+  line-height: 1.6;
+  white-space: pre;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="confetti-wrap" id="confetti"></div>
+
+<header>
+  <div class="header-brand">
+    <div class="header-logo">🎂</div>
+    <div class="header-title">
+      Birthday Board
+      <span>EMPLOYEE BIRTHDAY CALENDAR</span>
+    </div>
+  </div>
+  <div class="header-nav">
+    <button class="nav-btn active" onclick="showPage('birthday',this)">🎉 誕生日</button>
+    <button class="nav-btn" onclick="showPage('master',this)">👥 マスタ管理</button>
+    
+  </div>
+</header>
+
+
+<!-- ===== BIRTHDAY PAGE ===== -->
+<div class="page active" id="page-birthday">
+
+  <div class="today-section">
+    <div class="today-label">Today's Birthday</div>
+    <div class="today-date-line" id="todayDateLine"></div>
+    <div id="todayContent"><div class="today-none">読み込み中...</div></div>
+  </div>
+
+  <div class="section-title">今週のカレンダー</div>
+  <div class="week-grid" id="weekGrid"></div>
+
+  <div class="section-title">直近の誕生日（30日以内）</div>
+  <div class="upcoming-list" id="upcomingList"></div>
+
+</div>
+
+<!-- ===== MASTER PAGE ===== -->
+<div class="page" id="page-master">
+<div class="master-toolbar">
+    <div class="master-toolbar-left">
+      <button class="btn btn-primary" onclick="openModal()">＋ 追加</button>
+      <button class="btn btn-outline" onclick="exportCSV()">📥 CSV出力</button>
+      <label class="btn btn-outline" style="cursor:pointer;margin:0">
+        📤 CSVインポート
+        <input type="file" accept=".csv" style="display:none" onchange="importCSV(this)">
+      </label>
+    </div>
+    <div style="font-size:0.78rem;color:var(--text-muted)" id="countLabel"></div>
+  </div>
+
+  <div class="search-row">
+    <input class="search-in" id="searchIn" type="text" placeholder="🔍 氏名・部署で検索" oninput="renderTable()">
+    <select class="dept-sel" id="deptSel" onchange="renderTable()">
+      <option value="">全部署</option>
+    </select>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>氏名</th>
+          <th>所属部署</th>
+          <th>誕生日</th>
+          <th>次の誕生日</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="empty" id="emptyMsg" style="display:none">
+    <div class="ei">🧑‍💼</div>
+    <p>社員が登録されていません</p>
+    <p style="font-size:0.78rem;margin-top:4px">「追加」ボタンかGASから同期してください</p>
+  </div>
+
+</div>
+
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeOverlayOut(event)">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">社員を追加</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">氏名 <span class="req">*</span></label>
+        <input class="form-input" id="fName" placeholder="山田 太郎">
+      </div>
+      <div class="form-group">
+        <label class="form-label">所属部署 <span class="req">*</span></label>
+        <input class="form-input" id="fDept" placeholder="製造部" list="deptList">
+        <datalist id="deptList"></datalist>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">誕生日 <span class="req">*</span></label>
+      <input class="form-input" type="date" id="fBday">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveEmployee()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+
+// ===== FIXED DEPT COLOR MAP (9 departments) =====
+const DEPT_COLOR_MAP = {
+  '役員':    { bg:'rgba(200,153,58,0.18)',  fg:'#a07020', border:'#c8993a' },
+  '総務部':  { bg:'rgba(100,116,139,0.15)', fg:'#475569', border:'#94a3b8' },
+  '営業部':  { bg:'rgba(29,78,216,0.15)',   fg:'#1d4ed8', border:'#3b82f6' },
+  '第一製造部':{ bg:'rgba(6,182,212,0.15)', fg:'#0891b2', border:'#22d3ee' },
+  '設計課':  { bg:'rgba(99,102,241,0.15)',  fg:'#4f46e5', border:'#818cf8' },
+  '電気課':  { bg:'rgba(245,158,11,0.15)', fg:'#d97706', border:'#fbbf24' },
+  '加工課':  { bg:'rgba(16,185,129,0.15)', fg:'#059669', border:'#34d399' },
+  '組付課':  { bg:'rgba(139,92,246,0.15)', fg:'#7c3aed', border:'#a78bfa' },
+  '購買課':  { bg:'rgba(244,63,94,0.15)',  fg:'#be123c', border:'#fb7185' },
+};
+
+function getDeptStyle(dept) {
+  return DEPT_COLOR_MAP[dept] || { bg:'rgba(30,63,122,0.12)', fg:'#1e3f7a', border:'#93c5fd' };
+}
+
+// ===== STATE =====
+const LSKEY_DATA = 'bday_data_v2';
+const LSKEY_URL  = 'bday_gas_url';
+
+let employees = [];
+let editIdx = -1;
+
+// ===== BOOT ===== (moved to end of script)
+
+function getDemoData() {
+  const today = new Date();
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const dd = String(today.getDate()).padStart(2,'0');
+  const dd4 = String(today.getDate()+4 > 28 ? 2 : today.getDate()+4).padStart(2,'0');
+  return [
+    { name:'田中 一郎', dept:'製造部',    bday:`1985-${mm}-${dd}` },
+    { name:'鈴木 花子', dept:'品質管理部', bday:`1990-${mm}-${dd}` },
+    { name:'佐藤 次郎', dept:'調達部',    bday:`1988-${mm}-${dd4}` },
+    { name:'伊藤 美咲', dept:'製造部',    bday:'1992-03-22' },
+    { name:'渡辺 健',   dept:'品質管理部', bday:'1987-09-10' },
+  ];
+}
+
+// ===== UTILS =====
+const DAYS = ['日','月','火','水','木','金','土'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function sameMonthDay(bday, date) {
+  if (!bday) return false;
+  const [,m,d] = bday.split('-');
+  return +m === date.getMonth()+1 && +d === date.getDate();
+}
+
+function nextBirthday(bday) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const [,m,d] = bday.split('-');
+  let bd = new Date(today.getFullYear(), +m-1, +d);
+  if (bd < today) bd.setFullYear(bd.getFullYear()+1);
+  return bd;
+}
+
+function daysUntil(bday) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const nb = nextBirthday(bday);
+  return Math.round((nb - today) / 86400000);
+}
+
+function calcAge(bday) {
+  const today = new Date();
+  const [y,m,d] = bday.split('-').map(Number);
+  let age = today.getFullYear() - y;
+  if (today.getMonth()+1 < m || (today.getMonth()+1 === m && today.getDate() < d)) age--;
+  return age;
+}
+
+function initials(name) {
+  return name.replace(/\s/g,'').charAt(0);
+}
+
+function avatarHue(name) {
+  return (name.charCodeAt(0)*53 + (name.charCodeAt(name.length-1)||0)*17) % 360;
+}
+
+// ===== SYNC =====
+function setSyncStatus(state, msg) {}
+
+function saveGasUrl() {
+  const url = document.getElementById('gasUrlInput').value.trim();
+  localStorage.setItem(LSKEY_URL, url);
+  showToast('✅ URL を保存しました');
+}
+
+async function syncFromGas(silent = false) {
+  const url = document.getElementById('gasUrlInput').value.trim() || localStorage.getItem(LSKEY_URL);
+  if (!url) { showToast('⚠️ GAS URL を入力してください'); return; }
+
+  setSyncStatus('loading', 'スプレッドシートと同期中...');
+  try {
+    const res = await fetch(url, { method:'GET', redirect:'follow' });
+    const json = await res.json();
+    if (!json.ok) throw new Error('GAS returned error');
+    employees = json.data.filter(e => e.name && e.bday);
+    localStorage.setItem(LSKEY_DATA, JSON.stringify(employees));
+    const now = new Date();
+    setSyncStatus('ok', `最終同期: ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} — ${employees.length}名`);
+    renderAll();
+    if (!silent) showToast(`✅ ${employees.length}名のデータを同期しました`);
+  } catch(e) {
+    setSyncStatus('error', '同期失敗 — URLを確認してください');
+    if (!silent) showToast('❌ 同期に失敗しました');
+    if (!employees.length) { employees = getDemoData(); renderAll(); }
+  }
+}
+
+async function pushToGas(action, payload) {
+  const url = localStorage.getItem(LSKEY_URL);
+  if (!url) return false;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({ action, ...payload }),
+      headers: { 'Content-Type': 'application/json' },
+      redirect: 'follow',
+    });
+    return true;
+  } catch { return false; }
+}
+
+// ===== RENDER ALL =====
+function renderAll() {
+  renderBirthday();
+  renderTable();
+  updateDeptFilter();
+}
+
+// ===== BIRTHDAY PAGE =====
+function renderBirthday() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const wStart = new Date(today); wStart.setDate(today.getDate() - today.getDay());
+
+  // Date line
+  document.getElementById('todayDateLine').textContent =
+    `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${DAYS[today.getDay()]}曜日）`;
+
+  // Today's people
+  const todayPeople = employees.filter(e => sameMonthDay(e.bday, today));
+  const tcEl = document.getElementById('todayContent');
+  const todaySec = document.querySelector('.today-section');
+  if (!todayPeople.length) {
+    todaySec.classList.remove('has-birthday');
+    tcEl.innerHTML = `<div class="today-none">本日誕生日の社員はいません</div>`;
+  } else {
+    todaySec.classList.add('has-birthday');
+    tcEl.innerHTML = `<div class="today-cards">${todayPeople.map((e,i)=>`
+      <div class="today-card" style="animation-delay:${i*0.1}s">
+        <div class="bday-avatar">${initials(e.name)}</div>
+        <div>
+          <div class="bday-name">${e.name}</div>
+          <div class="bday-dept" style="color:${getDeptStyle(e.dept).border}">${e.dept}</div>
+          <div class="bday-celebrate">🎉 お誕生日おめでとうございます！</div>
+        </div>
+      </div>`).join('')}</div>`;
+    launchConfetti();
+  }
+
+  // Week grid
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(wStart); d.setDate(wStart.getDate()+i);
+    const isT = d.getTime() === today.getTime();
+    const ppl = employees.filter(e => sameMonthDay(e.bday, d));
+    const cell = document.createElement('div');
+    cell.className = 'day-cell' + (isT ? ' is-today' : '');
+    cell.innerHTML = `
+      <div class="dc-wd">${DAYS[d.getDay()]}曜</div>
+      <div class="day-n">${d.getDate()}</div>
+      ${ppl.length ? `<div class="dc-chips">${ppl.map(p=>`<div class="dc-chip" style="background:${getDeptStyle(p.dept).fg};color:white">${p.name.split(' ')[0]}</div>`).join('')}</div>` : ''}
+    `;
+    grid.appendChild(cell);
+  }
+
+  // Upcoming
+  const upcoming = employees
+    .map(e => ({ ...e, days: daysUntil(e.bday), nb: nextBirthday(e.bday) }))
+    .filter(e => e.days > 0 && e.days <= 30)
+    .sort((a,b) => a.days - b.days);
+
+  const ul = document.getElementById('upcomingList');
+  if (!upcoming.length) {
+    ul.innerHTML = `<div style="color:var(--text-muted);font-size:0.88rem;text-align:center;padding:20px">30日以内の誕生日はありません</div>`;
+  } else {
+    ul.innerHTML = upcoming.map(e => {
+      const cls = e.days<=3?'badge-hot':e.days<=7?'badge-soon':'badge-ok';
+      const lbl = e.days===1?'明日！':`あと${e.days}日`;
+      return `<div class="upc-item">
+        <div class="upc-cal">
+          <span class="cd" style="font-size:1.1rem">${e.nb.getMonth()+1}/${e.nb.getDate()}</span>
+        </div>
+        <div class="upc-info">
+          <div class="upc-name">${e.name}</div>
+          <div class="upc-dept" style="color:${getDeptStyle(e.dept).fg};font-weight:500">${e.dept}</div>
+        </div>
+        <span class="upc-badge ${cls}">${lbl}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ===== MASTER TABLE =====
+function updateDeptFilter() {
+  const depts = [...new Set(employees.map(e=>e.dept))].sort();
+  const sel = document.getElementById('deptSel');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">全部署</option>' +
+    depts.map(d=>`<option value="${d}" ${d===cur?'selected':''}>${d}</option>`).join('');
+  document.getElementById('deptList').innerHTML = depts.map(d=>`<option value="${d}">`).join('');
+}
+
+function renderTable() {
+  const searchEl = document.getElementById('searchIn');
+  const deptEl = document.getElementById('deptSel');
+  if (!searchEl || !deptEl) return;
+  const q = searchEl.value.toLowerCase();
+  const dept = deptEl.value;
+  let filtered = employees.filter(e =>
+    (!dept || e.dept===dept) &&
+    (e.name.toLowerCase().includes(q) || e.dept.toLowerCase().includes(q))
+  ).sort((a,b) => daysUntil(a.bday)-daysUntil(b.bday));
+
+  const tbody = document.getElementById('tbody');
+  const emptyEl = document.getElementById('emptyMsg');
+  const cl = document.getElementById('countLabel'); if(cl) cl.textContent = `${filtered.length}名 / 全${employees.length}名`;
+
+  if (!filtered.length) { tbody.innerHTML=''; emptyEl.style.display='block'; return; }
+  emptyEl.style.display='none';
+
+  tbody.innerHTML = filtered.map((e,i)=>{
+    const [,bm,bd] = e.bday.split('-');
+    const nb = nextBirthday(e.bday);
+    const days = daysUntil(e.bday);
+    const badgeCls = days===0?'badge-hot':days<=7?'badge-soon':'badge-ok';
+    const badgeLbl = days===0?'🎂 今日！':days<=7?`あと${days}日`:`あと${days}日`;
+    const origIdx = employees.indexOf(e);
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:30px;height:30px;border-radius:50%;background:hsl(${avatarHue(e.name)},45%,35%);color:white;display:flex;align-items:center;justify-content:center;font-size:0.82rem;flex-shrink:0">${initials(e.name)}</div>
+          <span style="font-weight:500">${e.name}</span>
+        </div>
+      </td>
+      <td><span style="display:inline-block;padding:2px 10px;border-radius:100px;font-size:0.72rem;font-weight:600;background:${getDeptStyle(e.dept).bg};color:${getDeptStyle(e.dept).fg};border:1px solid ${getDeptStyle(e.dept).border}">${e.dept}</span></td>
+      <td>${bm}/${bd}</td>
+      <td>
+        <span style="font-size:0.78rem;color:var(--text-muted)">${nb.getMonth()+1}/${nb.getDate()}</span>
+        <span class="upc-badge ${badgeCls}" style="margin-left:6px;padding:2px 8px;font-size:0.7rem">${badgeLbl}</span>
+      </td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="openModal(${origIdx})">編集</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteEmployee(${origIdx})">削除</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== MODAL =====
+function openModal(idx = -1) {
+  editIdx = idx;
+  document.getElementById('modalTitle').textContent = idx>=0 ? '社員を編集' : '社員を追加';
+  if (idx >= 0) {
+    const e = employees[idx];
+    document.getElementById('fName').value = e.name;
+    document.getElementById('fDept').value = e.dept;
+    document.getElementById('fBday').value = e.bday;
+  } else {
+    document.getElementById('fName').value = '';
+    document.getElementById('fDept').value = '';
+    document.getElementById('fBday').value = '';
+  }
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('overlay').classList.remove('open'); editIdx=-1; }
+function closeOverlayOut(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
+
+async function saveEmployee() {
+  const name = document.getElementById('fName').value.trim();
+  const dept = document.getElementById('fDept').value.trim();
+  const bday = document.getElementById('fBday').value;
+  if (!name || !dept || !bday) { showToast('⚠️ 全項目を入力してください'); return; }
+
+  if (editIdx >= 0) {
+    employees[editIdx] = { name, dept, bday };
+    showToast('✅ 更新しました');
+  } else {
+    employees.push({ name, dept, bday });
+    await pushToGas('add', { name, dept, bday });
+    showToast('✅ 追加しました');
+  }
+
+  localStorage.setItem(LSKEY_DATA, JSON.stringify(employees));
+  closeModal();
+  renderAll();
+}
+
+async function deleteEmployee(idx) {
+  if (!confirm(`「${employees[idx].name}」を削除してよろしいですか？`)) return;
+  const e = employees.splice(idx, 1)[0];
+  await pushToGas('delete', { name: e.name, bday: e.bday });
+  localStorage.setItem(LSKEY_DATA, JSON.stringify(employees));
+  renderAll();
+  showToast('🗑️ 削除しました');
+}
+
+// ===== CSV =====
+function importCSV(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = e.target.result.replace(/^\uFEFF/, '');
+    const lines = text.split('\n').filter(l => l.trim());
+    let imported = 0, skipped = 0;
+    lines.slice(1).forEach(line => {
+      const cols = line.split(',').map(s => s.trim());
+      const name = cols[0], dept = cols[1], bday = cols[2];
+      if (!name || !dept || !bday) { skipped++; return; }
+      const existing = employees.findIndex(x => x.name === name);
+      if (existing >= 0) { employees[existing] = { name, dept, bday }; }
+      else { employees.push({ name, dept, bday }); }
+      imported++;
+    });
+    localStorage.setItem(LSKEY_DATA, JSON.stringify(employees));
+    renderAll();
+    showToast(`✅ ${imported}名をインポートしました${skipped > 0 ? `（${skipped}件スキップ）` : ''}`);
+  };
+  reader.readAsText(file, 'UTF-8');
+  input.value = '';
+}
+
+function exportCSV() {
+  const rows = [['氏名','所属部署','誕生日'], ...employees.map(e=>[e.name,e.dept,e.bday])];
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download = `社員マスタ_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('📥 CSVをエクスポートしました');
+}
+
+// ===== CONFETTI =====
+function launchConfetti() {
+  const wrap = document.getElementById('confetti');
+  wrap.innerHTML = '';
+  const cols = ['#0d2347','#c8993a','#e8b84b','#1e3f7a','#a0aec0','#3b82f6'];
+  for (let i=0; i<50; i++) {
+    const el = document.createElement('div');
+    el.className = 'cp';
+    el.style.cssText = `
+      left:${Math.random()*100}%;
+      background:${cols[Math.floor(Math.random()*cols.length)]};
+      width:${5+Math.random()*5}px;
+      height:${5+Math.random()*10}px;
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      animation:fall ${2+Math.random()*2}s ${Math.random()*1}s linear forwards;
+    `;
+    wrap.appendChild(el);
+  }
+  setTimeout(()=>wrap.innerHTML='', 4000);
+}
+
+// ===== NAV =====
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  if (name==='master') renderMasterPage();
+}
+
+function renderMasterPage() {
+  updateDeptFilter();
+  renderTable();
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// Initial sync status
+setTimeout(()=>{
+  if (!localStorage.getItem(LSKEY_URL)) {
+    setSyncStatus('idle','GAS URL 未設定（デモデータ表示中）— 設定タブで連携してください');
+  }
+}, 100);
+
+// ===== EMBEDDED DATA =====
+const EMBEDDED_EMPLOYEES = [{"name": "中島 節雄", "dept": "役員", "bday": "1900-04-29"}, {"name": "中島 美千代", "dept": "役員", "bday": "1900-06-30"}, {"name": "中島 修", "dept": "営業部", "bday": "1900-06-22"}, {"name": "塩澤 真治", "dept": "組付課", "bday": "1900-12-03"}, {"name": "中泉 豊太郎", "dept": "役員", "bday": "1900-09-09"}, {"name": "川村 隆浩", "dept": "加工課", "bday": "1900-02-21"}, {"name": "吉田 一英", "dept": "組付課", "bday": "1900-08-03"}, {"name": "柏田 祐介", "dept": "加工課", "bday": "1900-07-16"}, {"name": "渡瀬 一美", "dept": "組付課", "bday": "1900-02-20"}, {"name": "平井 三洋", "dept": "設計課", "bday": "1900-10-01"}, {"name": "寺本 豊", "dept": "設計課", "bday": "1900-01-14"}, {"name": "成田 健", "dept": "電気課", "bday": "1900-01-10"}, {"name": "中島 正隆", "dept": "電気課", "bday": "1900-05-11"}, {"name": "中島 基木", "dept": "役員", "bday": "1900-09-25"}, {"name": "中島 大", "dept": "組付課", "bday": "1900-06-06"}, {"name": "竹内 和人", "dept": "組付課", "bday": "1900-10-29"}, {"name": "鈴木 桂", "dept": "設計課", "bday": "1900-06-21"}, {"name": "青山 薫", "dept": "加工課", "bday": "1900-05-03"}, {"name": "中島 学", "dept": "加工課", "bday": "1900-09-11"}, {"name": "加藤 愛子", "dept": "総務部", "bday": "1900-03-30"}, {"name": "野村 昌史", "dept": "加工課", "bday": "1900-08-27"}, {"name": "大出 直明", "dept": "加工課", "bday": "1900-07-25"}, {"name": "小池 佑介", "dept": "加工課", "bday": "1900-10-29"}, {"name": "鄒 永", "dept": "第一製造部", "bday": "1900-07-21"}, {"name": "加藤 幸浩", "dept": "電気課", "bday": "1900-09-29"}, {"name": "DUONG PHU QUY", "dept": "設計課", "bday": "1900-12-12"}, {"name": "石川 明雄", "dept": "第一製造部", "bday": "1900-09-17"}, {"name": "中村 勝一", "dept": "組付課", "bday": "1900-09-13"}, {"name": "笹倉 俊彦", "dept": "総務部", "bday": "1900-01-01"}, {"name": "大村 秀樹", "dept": "組付課", "bday": "1900-02-02"}, {"name": "中島 來夢", "dept": "設計課", "bday": "1900-09-22"}, {"name": "渡辺 健一", "dept": "組付課", "bday": "1900-12-15"}, {"name": "坂本 英一", "dept": "電気課", "bday": "1900-07-28"}, {"name": "松木 建太郎", "dept": "設計課", "bday": "1900-04-30"}, {"name": "坂野 公彦", "dept": "組付課", "bday": "1900-08-28"}, {"name": "宍倉 政樹", "dept": "役員", "bday": "1900-07-10"}, {"name": "宇野 孝祐", "dept": "電気課", "bday": "1900-04-23"}, {"name": "NGUYEN VAN LANH", "dept": "加工課", "bday": "1900-11-30"}, {"name": "井口 裕作", "dept": "電気課", "bday": "1900-02-10"}, {"name": "茨 泰憲", "dept": "設計課", "bday": "1900-08-20"}, {"name": "川口 信夫", "dept": "加工課", "bday": "1900-07-03"}, {"name": "広瀬 靖志", "dept": "設計課", "bday": "1900-05-01"}, {"name": "TRAN PHONG VU", "dept": "設計課", "bday": "1900-11-21"}, {"name": "TRAN VAN THAN", "dept": "加工課", "bday": "1900-05-19"}, {"name": "城 重光", "dept": "電気課", "bday": "1900-04-04"}, {"name": "深見 健太", "dept": "設計課", "bday": "1900-02-27"}, {"name": "NGUYEN HOANG AN", "dept": "加工課", "bday": "1900-10-10"}, {"name": "石原 知佳", "dept": "総務部", "bday": "1900-10-24"}, {"name": "伊串 希", "dept": "設計課", "bday": "1900-02-04"}, {"name": "近藤 あゆみ", "dept": "設計課", "bday": "1900-04-02"}, {"name": "澤井 裕司", "dept": "総務部", "bday": "1900-09-27"}, {"name": "米津 友里", "dept": "設計課", "bday": "1900-08-23"}, {"name": "當眞 一聖", "dept": "電気課", "bday": "1900-03-19"}, {"name": "川端 英裕", "dept": "加工課", "bday": "1900-09-28"}, {"name": "山田 護", "dept": "電気課", "bday": "1900-11-13"}, {"name": "近藤 隼次", "dept": "組付課", "bday": "1900-01-14"}, {"name": "太田 安彦", "dept": "加工課", "bday": "1900-02-17"}, {"name": "鶴永 将人", "dept": "購買課", "bday": "1900-06-13"}, {"name": "山口 奈奈美", "dept": "総務部", "bday": "1900-01-24"}, {"name": "尾崎 佑和", "dept": "組付課", "bday": "1900-03-20"}, {"name": "内木 緑", "dept": "購買課", "bday": "1900-02-07"}, {"name": "門野 友那", "dept": "総務部", "bday": "1900-12-27"}, {"name": "松尾 康平", "dept": "組付課", "bday": "1900-04-29"}, {"name": "有江 達夫", "dept": "営業部", "bday": "1900-09-12"}, {"name": "加古 武", "dept": "加工課", "bday": "1900-09-12"}, {"name": "大野 絢", "dept": "設計課", "bday": "1900-07-08"}, {"name": "佐藤 佳宏", "dept": "加工課", "bday": "1900-01-27"}, {"name": "小松 亜澄", "dept": "設計課", "bday": "1900-12-27"}, {"name": "NGUYEN THANH NHANH", "dept": "加工課", "bday": "1900-10-12"}, {"name": "廣瀬 昇", "dept": "設計課", "bday": "1900-03-13"}, {"name": "船木 勇作", "dept": "電気課", "bday": "1900-11-06"}, {"name": "石田 昌也", "dept": "加工課", "bday": "1900-02-12"}, {"name": "江嵜 嘉浩", "dept": "総務部", "bday": "1900-04-29"}, {"name": "古田 毅", "dept": "営業部", "bday": "1900-05-25"}, {"name": "坂本 和貴", "dept": "加工課", "bday": "1900-02-05"}, {"name": "角岡 優", "dept": "電気課", "bday": "1900-10-11"}, {"name": "NGUYEN THI TUYET MAI", "dept": "電気課", "bday": "1900-12-13"}, {"name": "TRAN KIM TUYEN", "dept": "加工課", "bday": "1900-11-15"}, {"name": "小野田 隆弘", "dept": "営業部", "bday": "1900-08-02"}, {"name": "荒川 真緒", "dept": "設計課", "bday": "1900-09-02"}, {"name": "宮川 哲平", "dept": "購買課", "bday": "1900-11-07"}, {"name": "髙木 和幸", "dept": "組付課", "bday": "1900-06-27"}, {"name": "NGUYEN HOANG PHUC AN", "dept": "電気課", "bday": "1900-12-12"}, {"name": "BIEN VAN MINH", "dept": "組付課", "bday": "1900-07-06"}, {"name": "伊織 奈津子", "dept": "購買課", "bday": "1900-06-24"}, {"name": "富樫 至史", "dept": "組付課", "bday": "1900-05-18"}, {"name": "牧内 宗真", "dept": "電気課", "bday": "1900-04-23"}, {"name": "中村 尚幹", "dept": "電気課", "bday": "1900-08-20"}, {"name": "TRAN CHI TAM", "dept": "加工課", "bday": "1900-01-07"}, {"name": "神谷 翼", "dept": "加工課", "bday": "1900-04-16"}, {"name": "真栄田 義斗", "dept": "組付課", "bday": "1900-06-08"}, {"name": "今泉 崇", "dept": "加工課", "bday": "1900-11-23"}, {"name": "荒木 萌々花", "dept": "電気課", "bday": "1900-02-20"}, {"name": "加藤 翼", "dept": "組付課", "bday": "1900-10-12"}, {"name": "田島 靖子", "dept": "総務部", "bday": "1900-12-12"}, {"name": "稲吉 一春", "dept": "営業部", "bday": "1900-12-17"}, {"name": "澤田 隆昭", "dept": "組付課", "bday": "1900-04-24"}];
+
+// ===== BOOT =====
+(function init() {
+  const url = localStorage.getItem(LSKEY_URL) || '';
+  const gasInput = document.getElementById('gasUrlInput');
+  if (gasInput) gasInput.value = url;
+
+  try {
+    const cached = localStorage.getItem(LSKEY_DATA);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      employees = parsed.length > 0 ? parsed : EMBEDDED_EMPLOYEES;
+    } else {
+      employees = EMBEDDED_EMPLOYEES;
+      localStorage.setItem(LSKEY_DATA, JSON.stringify(employees));
+    }
+  } catch { employees = EMBEDDED_EMPLOYEES; }
+
+  if (url) {
+    syncFromGas(true);
+  } else {
+    setSyncStatus('ok', `社員データ ${employees.length}名 読み込み済み`);
+    renderAll();
+  }
+})();
+</script>
+</body>
+</html>
