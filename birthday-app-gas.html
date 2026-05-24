@@ -821,6 +821,7 @@ function getDeptStyle(dept) {
 // ===== STATE =====
 const LSKEY_DATA = 'bday_data_v2';
 const LSKEY_URL  = 'bday_gas_url';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzLa8ZhcCXOGYk5dokEzvmX5TUUrsDikP4aPwskre3ZHxyrBQjkk1yA1iMIip0PDwR3dQ/exec';
 
 let employees = [];
 let editIdx = -1;
@@ -891,35 +892,32 @@ function saveGasUrl() {
 }
 
 async function syncFromGas(silent = false) {
-  const url = document.getElementById('gasUrlInput').value.trim() || localStorage.getItem(LSKEY_URL);
-  if (!url) { showToast('⚠️ GAS URL を入力してください'); return; }
-
-  setSyncStatus('loading', 'スプレッドシートと同期中...');
   try {
-    const res = await fetch(url, { method:'GET', redirect:'follow' });
+    const res = await fetch(GAS_URL + '?action=getEmployees&t=' + Date.now(), { method:'GET', redirect:'follow' });
     const json = await res.json();
     if (!json.ok) throw new Error('GAS returned error');
-    employees = json.data.filter(e => e.name && e.bday);
+    employees = (json.employees || json.data || []).filter(e => e.name && e.bday);
+    // IDがない場合は付与
+    employees = employees.map((e, i) => ({ id: e.id || (i+1), ...e }));
     localStorage.setItem(LSKEY_DATA, JSON.stringify(employees));
-    const now = new Date();
-    setSyncStatus('ok', `最終同期: ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} — ${employees.length}名`);
     renderAll();
     if (!silent) showToast(`✅ ${employees.length}名のデータを同期しました`);
   } catch(e) {
-    setSyncStatus('error', '同期失敗 — URLを確認してください');
     if (!silent) showToast('❌ 同期に失敗しました');
-    if (!employees.length) { employees = getDemoData(); renderAll(); }
+    // フォールバック：localStorageのキャッシュを使用
+    try {
+      const cached = localStorage.getItem(LSKEY_DATA);
+      if (cached) { employees = JSON.parse(cached); renderAll(); }
+    } catch {}
   }
 }
 
 async function pushToGas(action, payload) {
-  const url = localStorage.getItem(LSKEY_URL);
-  if (!url) return false;
   try {
-    await fetch(url, {
+    await fetch(GAS_URL, {
       method: 'POST',
       body: JSON.stringify({ action, ...payload }),
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       redirect: 'follow',
     });
     return true;
@@ -1093,11 +1091,15 @@ async function saveEmployee() {
   if (!name || !dept || !bday) { showToast('⚠️ 全項目を入力してください'); return; }
 
   if (editIdx >= 0) {
-    employees[editIdx] = { name, dept, bday };
+    const emp = employees[editIdx];
+    const id = emp.id || (editIdx + 1);
+    employees[editIdx] = { id, name, dept, bday };
+    await pushToGas('saveEmployee', { id, name, dept, bday });
     showToast('✅ 更新しました');
   } else {
-    employees.push({ name, dept, bday });
-    await pushToGas('add', { name, dept, bday });
+    const id = Date.now();
+    employees.push({ id, name, dept, bday });
+    await pushToGas('saveEmployee', { id, name, dept, bday });
     showToast('✅ 追加しました');
   }
 
@@ -1109,7 +1111,7 @@ async function saveEmployee() {
 async function deleteEmployee(idx) {
   if (!confirm(`「${employees[idx].name}」を削除してよろしいですか？`)) return;
   const e = employees.splice(idx, 1)[0];
-  await pushToGas('delete', { name: e.name, bday: e.bday });
+  await pushToGas('deleteEmployee', { id: e.id, name: e.name });
   localStorage.setItem(LSKEY_DATA, JSON.stringify(employees));
   renderAll();
   showToast('🗑️ 削除しました');
@@ -1192,39 +1194,19 @@ function showToast(msg) {
   setTimeout(()=>t.classList.remove('show'), 2800);
 }
 
-// Initial sync status
-setTimeout(()=>{
-  if (!localStorage.getItem(LSKEY_URL)) {
-    setSyncStatus('idle','GAS URL 未設定（デモデータ表示中）— 設定タブで連携してください');
-  }
-}, 100);
-
-// ===== EMBEDDED DATA =====
-const EMBEDDED_EMPLOYEES = [{"name": "中島 節雄", "dept": "役員", "bday": "1900-04-29"}, {"name": "中島 美千代", "dept": "役員", "bday": "1900-06-30"}, {"name": "中島 修", "dept": "営業部", "bday": "1900-06-22"}, {"name": "塩澤 真治", "dept": "組付課", "bday": "1900-12-03"}, {"name": "中泉 豊太郎", "dept": "役員", "bday": "1900-09-09"}, {"name": "川村 隆浩", "dept": "加工課", "bday": "1900-02-21"}, {"name": "吉田 一英", "dept": "組付課", "bday": "1900-08-03"}, {"name": "柏田 祐介", "dept": "加工課", "bday": "1900-07-16"}, {"name": "渡瀬 一美", "dept": "組付課", "bday": "1900-02-20"}, {"name": "平井 三洋", "dept": "設計課", "bday": "1900-10-01"}, {"name": "寺本 豊", "dept": "設計課", "bday": "1900-01-14"}, {"name": "成田 健", "dept": "電気課", "bday": "1900-01-10"}, {"name": "中島 正隆", "dept": "電気課", "bday": "1900-05-11"}, {"name": "中島 基木", "dept": "役員", "bday": "1900-09-25"}, {"name": "中島 大", "dept": "組付課", "bday": "1900-06-06"}, {"name": "竹内 和人", "dept": "組付課", "bday": "1900-10-29"}, {"name": "鈴木 桂", "dept": "設計課", "bday": "1900-06-21"}, {"name": "青山 薫", "dept": "加工課", "bday": "1900-05-03"}, {"name": "中島 学", "dept": "加工課", "bday": "1900-09-11"}, {"name": "加藤 愛子", "dept": "総務部", "bday": "1900-03-30"}, {"name": "野村 昌史", "dept": "加工課", "bday": "1900-08-27"}, {"name": "大出 直明", "dept": "加工課", "bday": "1900-07-25"}, {"name": "小池 佑介", "dept": "加工課", "bday": "1900-10-29"}, {"name": "鄒 永", "dept": "第一製造部", "bday": "1900-07-21"}, {"name": "加藤 幸浩", "dept": "電気課", "bday": "1900-09-29"}, {"name": "DUONG PHU QUY", "dept": "設計課", "bday": "1900-12-12"}, {"name": "石川 明雄", "dept": "第一製造部", "bday": "1900-09-17"}, {"name": "中村 勝一", "dept": "組付課", "bday": "1900-09-13"}, {"name": "笹倉 俊彦", "dept": "総務部", "bday": "1900-01-01"}, {"name": "大村 秀樹", "dept": "組付課", "bday": "1900-02-02"}, {"name": "中島 來夢", "dept": "設計課", "bday": "1900-09-22"}, {"name": "渡辺 健一", "dept": "組付課", "bday": "1900-12-15"}, {"name": "坂本 英一", "dept": "電気課", "bday": "1900-07-28"}, {"name": "松木 建太郎", "dept": "設計課", "bday": "1900-04-30"}, {"name": "坂野 公彦", "dept": "組付課", "bday": "1900-08-28"}, {"name": "宍倉 政樹", "dept": "役員", "bday": "1900-07-10"}, {"name": "宇野 孝祐", "dept": "電気課", "bday": "1900-04-23"}, {"name": "NGUYEN VAN LANH", "dept": "加工課", "bday": "1900-11-30"}, {"name": "井口 裕作", "dept": "電気課", "bday": "1900-02-10"}, {"name": "茨 泰憲", "dept": "設計課", "bday": "1900-08-20"}, {"name": "川口 信夫", "dept": "加工課", "bday": "1900-07-03"}, {"name": "広瀬 靖志", "dept": "設計課", "bday": "1900-05-01"}, {"name": "TRAN PHONG VU", "dept": "設計課", "bday": "1900-11-21"}, {"name": "TRAN VAN THAN", "dept": "加工課", "bday": "1900-05-19"}, {"name": "城 重光", "dept": "電気課", "bday": "1900-04-04"}, {"name": "深見 健太", "dept": "設計課", "bday": "1900-02-27"}, {"name": "NGUYEN HOANG AN", "dept": "加工課", "bday": "1900-10-10"}, {"name": "石原 知佳", "dept": "総務部", "bday": "1900-10-24"}, {"name": "伊串 希", "dept": "設計課", "bday": "1900-02-04"}, {"name": "近藤 あゆみ", "dept": "設計課", "bday": "1900-04-02"}, {"name": "澤井 裕司", "dept": "総務部", "bday": "1900-09-27"}, {"name": "米津 友里", "dept": "設計課", "bday": "1900-08-23"}, {"name": "當眞 一聖", "dept": "電気課", "bday": "1900-03-19"}, {"name": "川端 英裕", "dept": "加工課", "bday": "1900-09-28"}, {"name": "山田 護", "dept": "電気課", "bday": "1900-11-13"}, {"name": "近藤 隼次", "dept": "組付課", "bday": "1900-01-14"}, {"name": "太田 安彦", "dept": "加工課", "bday": "1900-02-17"}, {"name": "鶴永 将人", "dept": "購買課", "bday": "1900-06-13"}, {"name": "山口 奈奈美", "dept": "総務部", "bday": "1900-01-24"}, {"name": "尾崎 佑和", "dept": "組付課", "bday": "1900-03-20"}, {"name": "内木 緑", "dept": "購買課", "bday": "1900-02-07"}, {"name": "門野 友那", "dept": "総務部", "bday": "1900-12-27"}, {"name": "松尾 康平", "dept": "組付課", "bday": "1900-04-29"}, {"name": "有江 達夫", "dept": "営業部", "bday": "1900-09-12"}, {"name": "加古 武", "dept": "加工課", "bday": "1900-09-12"}, {"name": "大野 絢", "dept": "設計課", "bday": "1900-07-08"}, {"name": "佐藤 佳宏", "dept": "加工課", "bday": "1900-01-27"}, {"name": "小松 亜澄", "dept": "設計課", "bday": "1900-12-27"}, {"name": "NGUYEN THANH NHANH", "dept": "加工課", "bday": "1900-10-12"}, {"name": "廣瀬 昇", "dept": "設計課", "bday": "1900-03-13"}, {"name": "船木 勇作", "dept": "電気課", "bday": "1900-11-06"}, {"name": "石田 昌也", "dept": "加工課", "bday": "1900-02-12"}, {"name": "江嵜 嘉浩", "dept": "総務部", "bday": "1900-04-29"}, {"name": "古田 毅", "dept": "営業部", "bday": "1900-05-25"}, {"name": "坂本 和貴", "dept": "加工課", "bday": "1900-02-05"}, {"name": "角岡 優", "dept": "電気課", "bday": "1900-10-11"}, {"name": "NGUYEN THI TUYET MAI", "dept": "電気課", "bday": "1900-12-13"}, {"name": "TRAN KIM TUYEN", "dept": "加工課", "bday": "1900-11-15"}, {"name": "小野田 隆弘", "dept": "営業部", "bday": "1900-08-02"}, {"name": "荒川 真緒", "dept": "設計課", "bday": "1900-09-02"}, {"name": "宮川 哲平", "dept": "購買課", "bday": "1900-11-07"}, {"name": "髙木 和幸", "dept": "組付課", "bday": "1900-06-27"}, {"name": "NGUYEN HOANG PHUC AN", "dept": "電気課", "bday": "1900-12-12"}, {"name": "BIEN VAN MINH", "dept": "組付課", "bday": "1900-07-06"}, {"name": "伊織 奈津子", "dept": "購買課", "bday": "1900-06-24"}, {"name": "富樫 至史", "dept": "組付課", "bday": "1900-05-18"}, {"name": "牧内 宗真", "dept": "電気課", "bday": "1900-04-23"}, {"name": "中村 尚幹", "dept": "電気課", "bday": "1900-08-20"}, {"name": "TRAN CHI TAM", "dept": "加工課", "bday": "1900-01-07"}, {"name": "神谷 翼", "dept": "加工課", "bday": "1900-04-16"}, {"name": "真栄田 義斗", "dept": "組付課", "bday": "1900-06-08"}, {"name": "今泉 崇", "dept": "加工課", "bday": "1900-11-23"}, {"name": "荒木 萌々花", "dept": "電気課", "bday": "1900-02-20"}, {"name": "加藤 翼", "dept": "組付課", "bday": "1900-10-12"}, {"name": "田島 靖子", "dept": "総務部", "bday": "1900-12-12"}, {"name": "稲吉 一春", "dept": "営業部", "bday": "1900-12-17"}, {"name": "澤田 隆昭", "dept": "組付課", "bday": "1900-04-24"}];
-
 // ===== BOOT =====
 (function init() {
-  const url = localStorage.getItem(LSKEY_URL) || '';
-  const gasInput = document.getElementById('gasUrlInput');
-  if (gasInput) gasInput.value = url;
-
+  // まずlocalStorageのキャッシュで即座に表示
   try {
     const cached = localStorage.getItem(LSKEY_DATA);
     if (cached) {
       const parsed = JSON.parse(cached);
-      employees = parsed.length > 0 ? parsed : EMBEDDED_EMPLOYEES;
-    } else {
-      employees = EMBEDDED_EMPLOYEES;
-      localStorage.setItem(LSKEY_DATA, JSON.stringify(employees));
+      if (parsed.length > 0) { employees = parsed; renderAll(); }
     }
-  } catch { employees = EMBEDDED_EMPLOYEES; }
+  } catch {}
 
-  if (url) {
-    syncFromGas(true);
-  } else {
-    setSyncStatus('ok', `社員データ ${employees.length}名 読み込み済み`);
-    renderAll();
-  }
+  // バックグラウンドでGASから最新データを取得
+  syncFromGas(true);
 })();
 </script>
 </body>
