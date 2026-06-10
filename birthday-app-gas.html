@@ -819,8 +819,8 @@ async function syncFromGas(silent = false) {
       // ISO形式（例：1900-04-28T15:00:00.000Z）をMM-DDに変換
       if (bday && bday.includes('T')) {
         const d = new Date(bday);
-        const m = String(d.getUTCMonth()+1).padStart(2,'0');
-        const day = String(d.getUTCDate()).padStart(2,'0');
+        const m = String(d.getMonth()+1).padStart(2,'0');
+        const day = String(d.getDate()).padStart(2,'0');
         bday = `1900-${m}-${day}`;
       }
       return { ...e, bday };
@@ -1135,8 +1135,8 @@ function showToast(msg) {
           let bday = e.bday || e.birthday || '';
           if (bday && bday.includes('T')) {
             const d = new Date(bday);
-            const m = String(d.getUTCMonth()+1).padStart(2,'0');
-            const day = String(d.getUTCDate()).padStart(2,'0');
+            const m = String(d.getMonth()+1).padStart(2,'0');
+            const day = String(d.getDate()).padStart(2,'0');
             bday = `1900-${m}-${day}`;
           }
           return { ...e, bday };
