@@ -383,20 +383,9 @@ header {
 .badge-ok   { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
 
 /* ===== MASTER ===== */
-.master-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 18px;
-}
 
-.master-toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+
+
 
 .gas-url-section {
   background: var(--surface);
@@ -703,7 +692,6 @@ pre {
   </div>
   <div class="header-nav">
     <button class="nav-btn active" onclick="showPage('birthday',this)">🎉 誕生日</button>
-    <button class="nav-btn" onclick="showPage('master',this)">👥 マスタ管理</button>
     
   </div>
 </header>
@@ -727,78 +715,6 @@ pre {
 </div>
 
 <!-- ===== MASTER PAGE ===== -->
-<div class="page" id="page-master">
-<div class="master-toolbar">
-    <div class="master-toolbar-left">
-      <button class="btn btn-primary" onclick="openModal()">＋ 追加</button>
-      <button class="btn btn-outline" onclick="exportCSV()">📥 CSV出力</button>
-      <label class="btn btn-outline" style="cursor:pointer;margin:0">
-        📤 CSVインポート
-        <input type="file" accept=".csv" style="display:none" onchange="importCSV(this)">
-      </label>
-    </div>
-    <div style="font-size:0.78rem;color:var(--text-muted)" id="countLabel"></div>
-  </div>
-
-  <div class="search-row">
-    <input class="search-in" id="searchIn" type="text" placeholder="🔍 氏名・部署で検索" oninput="renderTable()">
-    <select class="dept-sel" id="deptSel" onchange="renderTable()">
-      <option value="">全部署</option>
-    </select>
-  </div>
-
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>氏名</th>
-          <th>所属部署</th>
-          <th>誕生日</th>
-          <th>次の誕生日</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
-  <div class="empty" id="emptyMsg" style="display:none">
-    <div class="ei">🧑‍💼</div>
-    <p>社員が登録されていません</p>
-    <p style="font-size:0.78rem;margin-top:4px">「追加」ボタンかGASから同期してください</p>
-  </div>
-
-</div>
-
-
-<!-- MODAL -->
-<div class="overlay" id="overlay" onclick="closeOverlayOut(event)">
-  <div class="modal">
-    <div class="modal-title" id="modalTitle">社員を追加</div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">氏名 <span class="req">*</span></label>
-        <input class="form-input" id="fName" placeholder="山田 太郎">
-      </div>
-      <div class="form-group">
-        <label class="form-label">所属部署 <span class="req">*</span></label>
-        <input class="form-input" id="fDept" placeholder="製造部" list="deptList">
-        <datalist id="deptList"></datalist>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">誕生日 <span class="req">*</span></label>
-      <input class="form-input" type="date" id="fBday">
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal()">キャンセル</button>
-      <button class="btn btn-primary" onclick="saveEmployee()">保存</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
 <script>
 
 // ===== FIXED DEPT COLOR MAP (9 departments) =====
@@ -821,7 +737,7 @@ function getDeptStyle(dept) {
 // ===== STATE =====
 const LSKEY_DATA = 'bday_data_v2';
 const LSKEY_URL  = 'bday_gas_url';
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzLa8ZhcCXOGYk5dokEzvmX5TUUrsDikP4aPwskre3ZHxyrBQjkk1yA1iMIip0PDwR3dQ/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwFE4wAC6cdFT8H2JmwW2XONgJz0j1rCI4xE2C9x1tKdMaib5aRgUKXE2N3hkQ034hu/exec';
 
 let employees = [];
 let editIdx = -1;
@@ -896,7 +812,10 @@ async function syncFromGas(silent = false) {
     const res = await fetch(GAS_URL + '?action=getEmployees&t=' + Date.now(), { method:'GET', redirect:'follow' });
     const json = await res.json();
     if (!json.ok) throw new Error('GAS returned error');
-    employees = (json.employees || json.data || []).filter(e => e.name && e.bday);
+    employees = (json.employees || json.data || [])
+    .filter(e => e.name && (e.bday || e.birthday))
+    .map(e => ({ ...e, bday: e.bday || e.birthday || '' }))
+    .filter(e => e.bday);
     // IDがない場合は付与
     employees = employees.map((e, i) => ({ id: e.id || (i+1), ...e }));
     localStorage.setItem(LSKEY_DATA, JSON.stringify(employees));
@@ -1179,7 +1098,6 @@ function showPage(name, btn) {
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   btn.classList.add('active');
-  if (name==='master') renderMasterPage();
 }
 
 function renderMasterPage() {
